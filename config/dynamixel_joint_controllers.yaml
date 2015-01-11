@@ -1,0 +1,177 @@
+rleg_j1_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: rleg_joint1
+    joint_speed: 2.0
+    motor:
+        id: 1
+        init: 512
+        min: 0
+        max: 1023
+
+rleg_j2_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: rleg_joint2
+    joint_speed: 2.0
+    motor:
+        id: 2
+        init: 512
+        min: 0
+        max: 1023
+
+rleg_j3_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: rleg_joint3
+    joint_speed: 2.0
+    motor:
+        id: 3
+        init: 512
+        min: 0
+        max: 1023
+
+rleg_j4_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: rleg_joint4
+    joint_speed: 2.0
+    motor:
+        id: 4
+        init: 512
+        min: 0
+        max: 1023
+
+rleg_j5_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: rleg_joint6
+    joint_speed: 2.0
+    motor:
+        id: 5
+        init: 512
+        min: 0
+        max: 1023
+
+rleg_j6_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: rleg_joint5
+    joint_speed: 2.0
+    motor:
+        id: 6
+        init: 512
+        min: 0
+        max: 1023
+
+lleg_j7_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: lleg_joint1
+    joint_speed: 2.0
+    motor:
+        id: 7
+        init: 512
+        min: 0
+        max: 1023
+
+lleg_j8_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: lleg_joint2
+    joint_speed: 2.0
+    motor:
+        id: 8
+        init: 512
+        min: 0
+        max: 1023
+
+
+lleg_j9_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: lleg_joint3
+    joint_speed: 2.0
+    motor:
+        id: 9
+        init: 512
+        min: 0
+        max: 1023
+
+
+lleg_j10_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: lleg_joint4
+    joint_speed: 2.0
+    motor:
+        id: 10
+        init: 512
+        min: 0
+        max: 1023
+
+lleg_j11_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: lleg_joint6
+    joint_speed: 2.0
+    motor:
+        id: 11
+        init: 512
+        min: 0
+        max: 1023
+
+lleg_j12_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: lleg_joint5
+    joint_speed: 2.0
+    motor:
+        id: 12
+        init: 512
+        min: 0
+        max: 1023
+
+fullbody_controller:
+   controller:
+       package: dynamixel_controllers
+       module: joint_trajectory_action_controller
+       type: JointTrajectoryActionController
+   joint_trajectory_action_node:
+       min_velocity: 0.25
+       constraints:
+           goal_time: 0.0
+
+gripper_controller:
+   controller:
+       package: dynamixel_controllers
+       module: joint_trajectory_action_controller
+       type: JointTrajectoryActionController
+   joint_trajectory_action_node:
+       min_velocity: 0.25
+       constraints:
+           goal_time: 0.0
