@@ -53,6 +53,7 @@
                           :bodies (list b1)
                           :name
                           :head-link1)))
+        (send bl :translate (float-vector 0 0 100) :world)
         (send bl :put :joint-coords
               (make-cascoords :coords
                               (send (send (send (send (send (car bs) :get :joint-coords) :copy-worldcoords ) :locate #f(0 0 25)) :rotate 0 :z) :rotate 0 :x)))
@@ -67,9 +68,9 @@
       (let ((bl (instance bodyset-link
                           :init (make-cascoords)
                           :bodies bs :name :head-link2)))
-        ;; (send bl :put :joint-coords
-        ;;       (make-cascoords :coords (send (send (send (send (send (car bs) :copy-worldcoords) :locate #f(20 0 -40)) :rotate -pi/2 :y) :rotate -pi/2 :x) :rotate 0 :z)))
-        ;; (send bl :assoc (send bl :get :joint-coords))
+        (send bl :put :joint-coords
+              (make-cascoords :coords (send (send (send (send (send (car bs) :copy-worldcoords) :locate #f(20 0 -40)) :rotate -pi/2 :y) :rotate -pi/2 :x) :rotate 0 :z)))
+        (send bl :assoc (send bl :get :joint-coords))
         bl))))
 
 ;; arm-link
@@ -144,10 +145,6 @@
       (send (car bs) :rotate -pi/2 :x :world)
       (let ((bl (instance bodyset-link :init (make-cascoords)
                           :bodies bs :name :root-link)))
-        (send bl :put :joint-coords
-              (make-cascoords :coords
-               (send (send (send (send (car bs) :get :joint-coords) :copy-worldcoords) :rotate -pi/2 :y) :locate #f(20 0 0))))
-        (send bl :assoc (send bl :get :joint-coords))
         bl))))
 
 ; ;; link1 :
@@ -169,9 +166,6 @@
       (let ((bl (instance bodyset-link
                           :init (make-cascoords)
                           :bodies bs :name :leg-link1)))
-        (send bl :put :joint-coords
-              (make-cascoords :coords (send (send (send (send (car bs) :copy-worldcoords) :locate #f(0 -20 -40)) :rotate -pi/2 :y) :rotate -pi/2 :z)))
-        (send bl :assoc (send bl :get :joint-coords))
         bl))))
 
 ;; link2 :
@@ -186,12 +180,6 @@
       (send (car bs) :rotate pi/2 :y :world)
       (let ((bl (instance bodyset-link :init (make-cascoords)
                           :bodies bs :name :leg-link2)))
-        (send bl :put :joint-coords
-              (make-cascoords
-               :coords
-               (send (send (send (send (send (car bs) :get :joint-coords) :copy-worldcoords) :rotate pi :y) :rotate pi/2 :z)
-                     :locate #f(0 0 40))))
-        (send bl :assoc (send bl :get :joint-coords))
         bl))))
 
 ;; link3 : frame2
@@ -218,11 +206,6 @@
 
     (let ((bl (instance bodyset-link :init (make-cascoords)
                         :bodies (append (list b) (mapcar #'cadr b1s)) :name :leg-link3)))
-      (send bl :put :joint-coords
-            (make-cascoords :coords
-                            ;; (send (send (send (send (send b :copy-worldcoords) :rotate pi/2 :y) :rotate pi/2 :z) :locate #f(-25 100 0) ) :rotate 0 :x)))
-                            (send (send (send (send (send b :copy-worldcoords) :rotate pi/2 :y) :rotate pi/2 :z) :locate #f(20 70 0) ) :rotate pi :y)))
-      (send bl :assoc (send bl :get :joint-coords))
       bl)))
 
 ;; link4 : motor+frame1-side+offset+motor
@@ -242,9 +225,6 @@
       (let ((bl (instance bodyset-link
                           :init (make-cascoords)
                           :bodies bs :name :leg-link4)))
-        (send bl :put :joint-coords
-              (make-cascoords :coords (send (send (send (send (send (car bs) :copy-worldcoords) :locate #f(20 0 -40)) :rotate -pi/2 :y) :rotate -pi/2 :x) :rotate pi :x)))
-        (send bl :assoc (send bl :get :joint-coords))
         bl))))
 
 ;; link5 :
@@ -254,9 +234,6 @@
     (send b1s :rotate pi/2 :y)
     (let ((bl (instance bodyset-link :init (make-cascoords)
                         :bodies (list b1s) :name :leg-link5)))
-      (send bl :put :joint-coords
-            (make-cascoords :coords (send (send b1s :copy-worldcoords) :rotate pi :y)))
-      (send bl :assoc (send bl :get :joint-coords))
       bl)))
 
 ;; link6 :
@@ -279,7 +256,7 @@
     (send c :locate #f(30 0 0))
 
     (instance bodyset-link :init (make-cascoords)
-                        :bodies (list b1s b c) :name :leg-link6)))
+              :bodies (list b1s b c) :name :leg-link6)))
 
 (defclass iorobot
   :super robot-model
@@ -298,15 +275,15 @@
      ;; leg setting
      (setq right-leg-root-link (send self :make-leg-root-link))
      (setq left-leg-root-link (send self :make-leg-root-link))
-     (setq rleg (send self :make-leg-links))
-     (setq lleg (send self :make-leg-links))
+     (setq rleg (send self :make-leg-links :rleg))
+     (setq lleg (send self :make-leg-links :lleg))
 
-     (send left-leg-root-link :move-coords (send aroot-link :get :joint-coords) (send left-leg-root-link :copy-worldcoords))
-     (send right-leg-root-link :move-coords (send aroot-link :get :joint-coords) (send right-leg-root-link :copy-worldcoords))
      (send left-leg-root-link :translate (float-vector 15 40 20) :world)
      (send right-leg-root-link :translate (float-vector 15 -40 20) :world)
-     (send (car rleg) :move-coords (send right-leg-root-link :get :joint-coords) (send (car rleg) :copy-worldcoords))
-     (send (car lleg) :move-coords (send left-leg-root-link :get :joint-coords) (send (car lleg) :copy-worldcoords))
+     (send left-leg-root-link :rotate -pi/2 :y)
+     (send right-leg-root-link :rotate -pi/2 :y)
+     (send left-leg-root-link :rotate pi :z)
+     (send right-leg-root-link :rotate pi :z)
 
      ;; head parts
      (setq head (send self :make-head-links))
@@ -342,6 +319,8 @@
      (send aroot-link :assoc left-arm-root-link)
      (send aroot-link :assoc right-arm-root-link)
      (send aroot-link :assoc head-root-link)
+
+     (send (car lleg):translate (float-vector 0 80 0) :world)
 
      ;; 3. make all joints
      ;;    Before making joints, you should :assoc all links.
@@ -494,10 +473,6 @@
 
      ;; 4. define slots for robot class
      ;; links and joint-list for cascaded-link.
-     ;; (setq links (append (list aroot-link) rleg))
-     ;; (setq joint-list (list jcr0 jcr1 jcr2 jcr3 jcr4 jcr5))
-     ;; (setq links (append (list aroot-link) lleg))
-     ;; (setq joint-list (list jcl0 jcl1 jcl2 jcl3 jcl4 jcl5))
      (setq links (append (list
                           aroot-link left-leg-root-link right-leg-root-link torso)
                          rleg lleg rarm larm head))
@@ -542,7 +517,6 @@
   ;; links
   ;; set to aroot-link
   (:make-root-link ()
-   ;;(make-dxl-7dof-rleg-root-link))
    (make-robot-root-link))
   (:make-torso-link ()
         (make-robot-torso-link)
@@ -574,21 +548,45 @@
   (:make-leg-root-link ()
      (make-robot-leg-root-link))
   (:make-leg-links
-   ()
-   (let ((ln
-          (list (make-robot-leg-link1)
-                (make-robot-leg-link2)
-                (make-robot-leg-link3)
-                (make-robot-leg-link4)
-                (make-robot-leg-link5)
-                (make-robot-leg-link6))))
-     (dotimes (i (1- (length ln)))
-       (send (elt ln (1+ i)) :move-coords
-             (send (elt ln i) :get :joint-coords)
-             (send (elt ln (1+ i)) :copy-worldcoords)))
-     (dotimes (i (1- (length ln)))
-       (send (elt ln i) :assoc (elt ln (1+ i))))
-     ln))
+   (l/r)
+   (let* ((bl1 (make-robot-leg-link1))
+          (bl2 (make-robot-leg-link2))
+          (bl3 (make-robot-leg-link3))
+          (bl4 (make-robot-leg-link4))
+          (bl5 (make-robot-leg-link5))
+          (bl6 (make-robot-leg-link6)))
+     (send bl6 :translate #f(0 -40 0))
+     ;;(send bl6 :rotate pi :x)
+     (send bl6 :rotate pi :z)
+
+     (send bl5 :rotate pi/2 :z)
+     (send bl5 :rotate -pi/2 :x)
+     (send bl5 :translate #f(-50 0 0))
+     (send bl5 :assoc bl6)
+     (send bl5 :rotate -pi/2 :z)
+     (send bl5 :rotate pi :x)
+
+     (send bl5 :translate #f(-230 -15 0))
+     (send bl4 :translate #f(0 -60 -150))
+     (send bl4 :rotate pi/2 :z)
+     (send bl4 :rotate -pi/2 :x)
+     (send bl4 :assoc bl5)
+
+     (send bl3 :translate #f(0 -20 -70))
+     (send bl3 :rotate pi/2 :y)
+     (send bl3 :rotate -pi/2 :x)
+     (send bl3 :assoc bl4)
+
+     (send bl2 :translate #f(0 -40 -40))
+     (send bl2 :rotate pi/2 :y)
+     (send bl2 :rotate -pi/2 :x)
+     (send bl2 :assoc bl3)
+
+     (send bl1 :translate #f(0 -40 -20))
+     (send bl1 :rotate pi/2 :y)
+     (send bl1 :rotate pi/2 :x)
+     (send bl1 :assoc bl2)
+     (list bl1 bl2 bl3 bl4 bl5 bl6)))
   ;; joints
   (:head_joint1 () joint-head0)
 
