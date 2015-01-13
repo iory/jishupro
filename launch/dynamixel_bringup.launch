@@ -33,7 +33,13 @@
                 lleg_j9_controller
                 lleg_j10_controller
                 lleg_j11_controller
-		        lleg_j12_controller"
+		        lleg_j12_controller
+                rarm_j1_controller
+                rarm_j2_controller
+                rarm_j3_controller
+                larm_j1_controller
+                larm_j2_controller
+                larm_j3_controller"
           output="screen"/>
 
     <!-- start trajectory controllers for fullbody + gripper -->
@@ -53,7 +59,13 @@
                 lleg_j9_controller
                 lleg_j10_controller
                 lleg_j11_controller
-		        lleg_j12_controller"
+		        lleg_j12_controller
+                rarm_j1_controller
+                rarm_j2_controller
+                rarm_j3_controller
+                larm_j1_controller
+                larm_j2_controller
+                larm_j3_controller"
           output="screen"/>
 
     <!-- TODO : Should use gripper_controller_spawner.launch instead of .sh ;; timing problem -->

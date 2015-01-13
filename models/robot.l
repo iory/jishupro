@@ -478,8 +478,8 @@
                          rleg lleg rarm larm head))
      (setq joint-list (list jcr0 jcr1 jcr2 jcr3 jcr4 jcr5
                             jcl0 jcl1 jcl2 jcl3 jcl4 jcl5
-                            ;; joint-rarm0 joint-rarm1 joint-rarm2
-                            ;; joint-larm0 joint-larm1 joint-larm2
+                            joint-rarm0 joint-rarm1 joint-rarm2
+                            joint-larm0 joint-larm1 joint-larm2
                             ;; joint-head0
 			    ))
      ;;    These are for robot-model.
@@ -556,7 +556,6 @@
           (bl5 (make-robot-leg-link5))
           (bl6 (make-robot-leg-link6)))
      (send bl6 :translate #f(0 -40 0))
-     ;;(send bl6 :rotate pi :x)
      (send bl6 :rotate pi :z)
 
      (send bl5 :rotate pi/2 :z)

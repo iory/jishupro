@@ -156,6 +156,84 @@ lleg_j12_controller:
         min: 0
         max: 1023
 
+rarm_j1_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: rarm_joint1
+    joint_speed: 2.0
+    motor:
+        id: 13
+        init: 512
+        min: 0
+        max: 1023
+
+rarm_j2_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: rarm_joint2
+    joint_speed: 2.0
+    motor:
+        id: 14
+        init: 512
+        min: 0
+        max: 1023
+
+rarm_j3_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: rarm_joint3
+    joint_speed: 2.0
+    motor:
+        id: 15
+        init: 512
+        min: 0
+        max: 1023
+
+larm_j1_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: larm_joint1
+    joint_speed: 2.0
+    motor:
+        id: 16
+        init: 512
+        min: 0
+        max: 1023
+
+larm_j2_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: larm_joint2
+    joint_speed: 2.0
+    motor:
+        id: 17
+        init: 512
+        min: 0
+        max: 1023
+
+larm_j3_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: larm_joint3
+    joint_speed: 2.0
+    motor:
+        id: 18
+        init: 512
+        min: 0
+        max: 1023
+
 fullbody_controller:
    controller:
        package: dynamixel_controllers
