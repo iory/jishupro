@@ -23,7 +23,7 @@
     (objects (append (list robot) footstep-list))
     ;; footstep-list is coordinates list.
     ;; This should have :l/r method or :l/r name.
-    (setq default-step-height 0.9)
+    ;;(setq default-step-height 0.9)
     (send robot :calc-walk-pattern-from-footstep-list
           footstep-list :debug-view :no-message
           :default-step-height default-step-height)
@@ -37,7 +37,8 @@
   (send robot :calc-walk-pattern-from-footstep-list
         (send robot :go-pos-params->footstep-list
               500 150 45) ;; x[mm] y[mm] th[deg]
-        :default-step-height default-step-height)
+        :default-step-height default-step-height
+        )
   ))
 
 (defclass iorobot-interface

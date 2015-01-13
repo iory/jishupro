@@ -654,10 +654,17 @@
                                           0.0 0.0 0.0
                                           0.0 0.0 0.0
                                           0.0)))
+  ;; (:reset-pose
+  ;;  ()
+  ;;  (send self :angle-vector (float-vector 0.0 0.0 0.0 0.0 0.0 0.0
+  ;;                                         0.0 0.0 0.0 0.0 0.0 0.0
+  ;;                                         0.0 60.0 -30.0
+  ;;                                         0.0 60.0 -30.0
+  ;;                                         0.0)))
   (:reset-pose
    ()
-   (send self :angle-vector (float-vector 0.0 0.0 0.0 0.0 0.0 0.0
-                                          0.0 0.0 0.0 0.0 0.0 0.0
+   (send self :angle-vector (float-vector 0 0 -30 60 30 0
+                                          0 0 -30 60 30 0
                                           0.0 60.0 -30.0
                                           0.0 60.0 -30.0
                                           0.0)))
