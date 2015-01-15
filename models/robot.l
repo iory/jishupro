@@ -74,7 +74,7 @@
         bl))))
 
 ;; arm-link
-(defun make-robot-arm-link1 ()
+(defun make-robot-rarm-link1 ()
   (let ((b1 (make-dynamixel-AX-12A-motor-body)))
     (send b1 :rotate pi/2 :z)
     (send b1 :rotate -pi/2 :y)
@@ -84,25 +84,26 @@
                           :init (make-cascoords)
                           :bodies (list b1)
                           :name
-                          :arm-link1)))
+                          :rarm-link1)))
         (send bl :put :joint-coords
               (make-cascoords :coords
-                              (send (send (send (send (send (car bs) :get :joint-coords) :copy-worldcoords ) :locate #f(0 0 25)) :rotate pi/2 :z) :rotate pi :x)))
+                              (send (send (send (send (send (send (car bs) :get :joint-coords) :copy-worldcoords ) :locate #f(0 0 -125)) :rotate -pi/2 :z) :rotate 0 :x) :rotate pi :z)))
         (send bl :assoc (send bl :get :joint-coords))
         bl))))
 
-(defun make-robot-arm-link2 ()
+(defun make-robot-rarm-link2 ()
   (let ((b1 (make-dynamixel-AX-12A-frame2-body)))
     (let ((bl (instance bodyset-link
                         :init (make-cascoords)
-                        :bodies (list b1) :name :arm-link2)))
+                        :bodies (list b1)
+                        :name :rarm-link2)))
       (send bl :put :joint-coords
             (make-cascoords :coords
-                            (send (send b1 :copy-worldcoords) :locate #f(0 0 0))))
+                            (send (send (send b1 :copy-worldcoords) :locate #f(0 0 0)) :rotate -pi :z)))
       (send bl :assoc (send bl :get :joint-coords))
       bl)))
 
-(defun make-robot-arm-link3 ()
+(defun make-robot-rarm-link3 ()
   (let ((b1s (make-dynamixel-AX-12A-motor-unit-bodies :use-frame1 (list :bottom)))
         (b2 (make-dynamixel-AX-12A-frame2-body)))
     (let ((bs (append (mapcar #'cadr b1s) (list b2))))
@@ -114,13 +115,13 @@
       (send b2 :locate #f(0 0 -70))
       (let ((bl (instance bodyset-link
                           :init (make-cascoords)
-                          :bodies bs :name :arm-link3)))
+                          :bodies bs :name :rarm-link3)))
         (send bl :put :joint-coords
-              (make-cascoords :coords (send (send (send (send (car bs) :copy-worldcoords) :locate #f(0 -80 0)) :rotate -pi/2 :y) :rotate 0 :z)))
+              (make-cascoords :coords (send (send (send (send (send (car bs) :copy-worldcoords) :locate #f(0 -70 0)) :rotate -pi/2 :y) :rotate pi :z) :rotate pi :x)))
         (send bl :assoc (send bl :get :joint-coords))
         bl))))
 
-(defun make-robot-arm-link4 ()
+(defun make-robot-rarm-link4 ()
   (let ((b1 (make-dynamixel-AX-12A-motor-body)))
     (send b1 :rotate pi/2 :x)
     (let ((bs (list b1)))
@@ -128,7 +129,70 @@
       (send (car bs) :rotate pi/2 :y)
       (send (car bs) :rotate -pi/2 :x :world)
       (let ((bl (instance bodyset-link :init (make-cascoords)
-                          :bodies bs :name :arm-link4)))
+                          :bodies bs :name :rarm-link4)))
+        (send bl :put :joint-coords
+              (make-cascoords :coords
+               (send (send (send (send (car bs) :get :joint-coords) :copy-worldcoords) :rotate -pi/2 :y) :locate #f(20 0 0))))
+        (send bl :assoc (send bl :get :joint-coords))
+        bl))))
+
+
+(defun make-robot-larm-link1 ()
+  (let ((b1 (make-dynamixel-AX-12A-motor-body)))
+    (send b1 :rotate pi/2 :z)
+    (send b1 :rotate -pi/2 :y)
+    (let ((bs (list b1)))
+      (dolist (b (cdr bs)) (send (car bs) :assoc b))
+      (let ((bl (instance bodyset-link
+                          :init (make-cascoords)
+                          :bodies (list b1)
+                          :name
+                          :larm-link1)))
+        (send bl :put :joint-coords
+              (make-cascoords :coords
+                              (send (send (send (send (send (car bs) :get :joint-coords) :copy-worldcoords ) :locate #f(0 0 25)) :rotate pi/2 :z) :rotate pi :x)))
+        (send bl :assoc (send bl :get :joint-coords))
+        bl))))
+
+(defun make-robot-larm-link2 ()
+  (let ((b1 (make-dynamixel-AX-12A-frame2-body)))
+    (let ((bl (instance bodyset-link
+                        :init (make-cascoords)
+                        :bodies (list b1)
+                        :name :larm-link2)))
+      (send bl :put :joint-coords
+            (make-cascoords :coords
+                            (send (send b1 :copy-worldcoords) :locate #f(0 0 0))))
+      (send bl :assoc (send bl :get :joint-coords))
+      bl)))
+
+(defun make-robot-larm-link3 ()
+  (let ((b1s (make-dynamixel-AX-12A-motor-unit-bodies :use-frame1 (list :bottom)))
+        (b2 (make-dynamixel-AX-12A-frame2-body)))
+    (let ((bs (append (mapcar #'cadr b1s) (list b2))))
+      ;; (car bs) is servo model
+      (dolist (b (cdr bs)) (send (car bs) :assoc b))
+      (send (car bs) :rotate pi/2 :x)
+      (send b2 :rotate pi :z)
+      (send b2 :rotate pi/2 :x)
+      (send b2 :locate #f(0 0 -70))
+      (let ((bl (instance bodyset-link
+                          :init (make-cascoords)
+                          :bodies bs :name :larm-link3)))
+        (send bl :put :joint-coords
+              (make-cascoords :coords (send (send (send (send (send (car bs) :copy-worldcoords) :locate #f(0 -70 0)) :rotate -pi/2 :y) :rotate pi :z) :rotate pi :x)))
+        (send bl :assoc (send bl :get :joint-coords))
+        bl))))
+
+(defun make-robot-larm-link4 ()
+  (let ((b1 (make-dynamixel-AX-12A-motor-body)))
+    (send b1 :rotate pi/2 :x)
+    (let ((bs (list b1)))
+      (dolist (b (cdr bs)) (send (car bs) :assoc b))
+      (send (car bs) :rotate pi/2 :y)
+      (send (car bs) :rotate -pi/2 :x :world)
+      (let ((bl (instance bodyset-link :init (make-cascoords)
+                          :bodies bs :name :larm-link4)))
         (send bl :put :joint-coords
               (make-cascoords :coords
                (send (send (send (send (car bs) :get :joint-coords) :copy-worldcoords) :rotate -pi/2 :y) :locate #f(20 0 0))))
@@ -297,13 +361,13 @@
 
      ;; arm setting
      ;; right-arm
-     (setq rarm (send self :make-arm-links))
+     (setq rarm (send self :make-arm-links :rarm))
      (setq right-arm-root-link (car rarm))
      (send right-arm-root-link :move-coords (send aroot-link :get :joint-coords) (send right-arm-root-link :copy-worldcoords))
-     (send (send right-arm-root-link :translate (float-vector 0 -35 150) :world) :rotate pi :x)
+     (send (send right-arm-root-link :translate (float-vector 0 -35 150) :world) :rotate 0 :x)
 
      ;; left-arm
-     (setq larm (send self :make-arm-links))
+     (setq larm (send self :make-arm-links :larm))
      (setq left-arm-root-link (car larm))
      (send left-arm-root-link :move-coords (send aroot-link :get :joint-coords) (send left-arm-root-link :copy-worldcoords))
      (send left-arm-root-link :translate (float-vector 0 35 150) :world)
@@ -340,43 +404,43 @@
                          :child-link (elt rleg 0)
                          :name "rleg_joint1"
                          :axis :x
-                         :min -60
-                         :max 30))
+                         :min -180
+                         :max 180))
      (setq jcr1 (instance rotational-joint
                          :init :parent-link (elt rleg 0)
                          :child-link (elt rleg 1)
                          :name "rleg_joint2"
                          :axis :y
-                         :min -10
-                         :max 90))
+                         :min -180
+                         :max 180))
      (setq jcr2 (instance rotational-joint
                          :init :parent-link (elt rleg 1)
                          :child-link (elt rleg 2)
                          :name "rleg_joint3"
                          :axis :z
-                         :min -70
-                         :max 90))
+                         :min -180
+                         :max 180))
      (setq jcr3 (instance rotational-joint
                          :init :parent-link (elt rleg 2)
                          :child-link (elt rleg 3)
                          :name "rleg_joint4"
                          :axis :x
-                         :min -135
-                         :max 135))
+                         :min -180
+                         :max 180))
      (setq jcr4 (instance rotational-joint
                          :init :parent-link (elt rleg 3)
                          :child-link (elt rleg 4)
                          :name "rleg_joint5"
                          :axis :y
-                         :min -90
-                         :max 45))
+                         :min -180
+                         :max 180))
      (setq jcr5 (instance rotational-joint
                          :init :parent-link (elt rleg 4)
                          :child-link (elt rleg 5)
                          :name "rleg_joint6"
                          :axis :x
-                         :min -30
-                         :max 30))
+                         :min -180
+                         :max 180))
 
      ;; left-leg
      (setq jcl0 (instance rotational-joint
@@ -384,43 +448,131 @@
                          :child-link (elt lleg 0)
                          :name "lleg_joint1"
                          :axis :x
-                         :min -30
-                         :max 60))
+                         :min -180
+                         :max 180))
      (setq jcl1 (instance rotational-joint
                          :init :parent-link (elt lleg 0)
                          :child-link (elt lleg 1)
                          :name "lleg_joint2"
                          :axis :y
-                         :min -90
-                         :max 10))
+                         :min -180
+                         :max 180))
      (setq jcl2 (instance rotational-joint
                          :init :parent-link (elt lleg 1)
                          :child-link (elt lleg 2)
                          :name "lleg_joint3"
                          :axis :z
-                         :min -70
-                         :max 90))
+                         :min -180
+                         :max 180))
      (setq jcl3 (instance rotational-joint
                          :init :parent-link (elt lleg 2)
                          :child-link (elt lleg 3)
                          :name "lleg_joint4"
                          :axis :x
-                         :min -135
-                         :max 135))
+                         :min -180
+                         :max 180))
      (setq jcl4 (instance rotational-joint
                          :init :parent-link (elt lleg 3)
                          :child-link (elt lleg 4)
                          :name "lleg_joint5"
                          :axis :y
-                         :min -90
-                         :max 45))
+                         :min -180
+                         :max 180))
      (setq jcl5 (instance rotational-joint
                          :init :parent-link (elt lleg 4)
                          :child-link (elt lleg 5)
                          :name "lleg_joint6"
                          :axis :x
-                         :min -30
-                         :max 30))
+                         :min -180
+                         :max 180))
+
+     ;; (setq jcr0 (instance rotational-joint
+     ;;                     :init :parent-link right-leg-root-link
+     ;;                     :child-link (elt rleg 0)
+     ;;                     :name "rleg_joint1"
+     ;;                     :axis :x
+     ;;                     :min -60
+     ;;                     :max 30))
+     ;; (setq jcr1 (instance rotational-joint
+     ;;                     :init :parent-link (elt rleg 0)
+     ;;                     :child-link (elt rleg 1)
+     ;;                     :name "rleg_joint2"
+     ;;                     :axis :y
+     ;;                     :min -10
+     ;;                     :max 90))
+     ;; (setq jcr2 (instance rotational-joint
+     ;;                     :init :parent-link (elt rleg 1)
+     ;;                     :child-link (elt rleg 2)
+     ;;                     :name "rleg_joint3"
+     ;;                     :axis :z
+     ;;                     :min -70
+     ;;                     :max 90))
+     ;; (setq jcr3 (instance rotational-joint
+     ;;                     :init :parent-link (elt rleg 2)
+     ;;                     :child-link (elt rleg 3)
+     ;;                     :name "rleg_joint4"
+     ;;                     :axis :x
+     ;;                     :min -135
+     ;;                     :max 135))
+     ;; (setq jcr4 (instance rotational-joint
+     ;;                     :init :parent-link (elt rleg 3)
+     ;;                     :child-link (elt rleg 4)
+     ;;                     :name "rleg_joint5"
+     ;;                     :axis :y
+     ;;                     :min -90
+     ;;                     :max 45))
+     ;; (setq jcr5 (instance rotational-joint
+     ;;                     :init :parent-link (elt rleg 4)
+     ;;                     :child-link (elt rleg 5)
+     ;;                     :name "rleg_joint6"
+     ;;                     :axis :x
+     ;;                     :min -30
+     ;;                     :max 30))
+
+     ;; ;; left-leg
+     ;; (setq jcl0 (instance rotational-joint
+     ;;                     :init :parent-link left-leg-root-link
+     ;;                     :child-link (elt lleg 0)
+     ;;                     :name "lleg_joint1"
+     ;;                     :axis :x
+     ;;                     :min -30
+     ;;                     :max 60))
+     ;; (setq jcl1 (instance rotational-joint
+     ;;                     :init :parent-link (elt lleg 0)
+     ;;                     :child-link (elt lleg 1)
+     ;;                     :name "lleg_joint2"
+     ;;                     :axis :y
+     ;;                     :min -90
+     ;;                     :max 10))
+     ;; (setq jcl2 (instance rotational-joint
+     ;;                     :init :parent-link (elt lleg 1)
+     ;;                     :child-link (elt lleg 2)
+     ;;                     :name "lleg_joint3"
+     ;;                     :axis :z
+     ;;                     :min -70
+     ;;                     :max 90))
+     ;; (setq jcl3 (instance rotational-joint
+     ;;                     :init :parent-link (elt lleg 2)
+     ;;                     :child-link (elt lleg 3)
+     ;;                     :name "lleg_joint4"
+     ;;                     :axis :x
+     ;;                     :min -135
+     ;;                     :max 135))
+     ;; (setq jcl4 (instance rotational-joint
+     ;;                     :init :parent-link (elt lleg 3)
+     ;;                     :child-link (elt lleg 4)
+     ;;                     :name "lleg_joint5"
+     ;;                     :axis :y
+     ;;                     :min -90
+     ;;                     :max 45))
+     ;; (setq jcl5 (instance rotational-joint
+     ;;                     :init :parent-link (elt lleg 4)
+     ;;                     :child-link (elt lleg 5)
+     ;;                     :name "lleg_joint6"
+     ;;                     :axis :x
+     ;;                     :min -30
+     ;;                     :max 30))
+
 
      ;; joint-rarm setting
      (setq joint-rarm0 (instance rotational-joint
@@ -480,7 +632,7 @@
                             jcl0 jcl1 jcl2 jcl3 jcl4 jcl5
                             joint-rarm0 joint-rarm1 joint-rarm2
                             joint-larm0 joint-larm1 joint-larm2
-                            ;; joint-head0
+                            joint-head0
 			    ))
      ;;    These are for robot-model.
      (setq rleg-root-link (car rleg))
@@ -489,8 +641,12 @@
      ;;    end-coords
      (setq rarm-end-coords (make-cascoords :coords
                                            (send (send (elt rarm 3) :copy-worldcoords) :translate (float-vector 0 0 0))))
+     (send (elt rarm 3) :assoc rarm-end-coords)
+
      (setq larm-end-coords (make-cascoords :coords
                                            (send (send (elt larm 3) :copy-worldcoords) :translate (float-vector 0 0 0))))
+     (send (elt larm 3) :assoc larm-end-coords)
+
      (setq rleg-end-coords (make-cascoords :coords
                                            (send (send (send (elt rleg 5) :copy-worldcoords) :translate (float-vector 0 30 0)) :rotate pi/2 :x)))
      (send (elt rleg 5) :assoc rleg-end-coords)
@@ -532,12 +688,20 @@
      (dotimes (i (1- (length ln)))
        (send (elt ln i) :assoc (elt ln (1+ i))))
      ln))
-  (:make-arm-links ()
+  (:make-arm-links (l/r)
    (let ((ln
-          (list (make-robot-arm-link1)
-                (make-robot-arm-link2)
-                (make-robot-arm-link3)
-                (make-robot-arm-link4))))
+          (case l/r
+            (:rarm
+             (list (make-robot-rarm-link1)
+                   (make-robot-rarm-link2)
+                   (make-robot-rarm-link3)
+                   (make-robot-rarm-link4)))
+            (:larm
+             (list (make-robot-larm-link1)
+                   (make-robot-larm-link2)
+                   (make-robot-larm-link3)
+                   (make-robot-larm-link4)))
+            )))
      (dotimes (i (1- (length ln)))
        (send (elt ln (1+ i)) :move-coords
              (send (elt ln i) :get :joint-coords)
@@ -648,23 +812,21 @@
   ;; poses
   (:init-pose
    ()
-   ;;(send self :angle-vector (instantiate float-vector (send self :calc-target-joint-dimension (cdr (send self :links))))))
+   ;; (send self :angle-vector (instantiate float-vector (send self :calc-target-joint-dimension (cdr (send self :links))))))
    (send self :angle-vector (float-vector 0.0 0.0 0.0 0.0 0.0 0.0
                                           0.0 0.0 0.0 0.0 0.0 0.0
                                           0.0 0.0 0.0
                                           0.0 0.0 0.0
                                           0.0)))
-  ;; (:reset-pose
-  ;;  ()
-  ;;  (send self :angle-vector (float-vector 0.0 0.0 0.0 0.0 0.0 0.0
-  ;;                                         0.0 0.0 0.0 0.0 0.0 0.0
-  ;;                                         0.0 60.0 -30.0
-  ;;                                         0.0 60.0 -30.0
-  ;;                                         0.0)))
   (:reset-pose
    ()
-   (send self :angle-vector (float-vector 0 0 -30 60 30 0
-                                          0 0 -30 60 30 0
+   ;; (send self :angle-vector (float-vector 0 0 -45 75 30 0
+   ;;                                        0 0 -45 75 30 0
+   ;;                                        0.0 60.0 -30.0
+   ;;                                        0.0 60.0 -30.0
+   ;;                                        0.0)))
+   (send self :angle-vector (float-vector 0 0 -15 30 15 0
+                                          0 0 -15 30 15 0
                                           0.0 60.0 -30.0
                                           0.0 60.0 -30.0
                                           0.0)))
@@ -680,6 +842,12 @@
                                            0 0 0
                                            0 0 0
                                            0)))
+  (:test ()
+         (send self :angle-vector (float-vector 30 10 -10 20 10 10
+                                           30 -10 -10 20 10 -10
+                                           0 0 0
+                                           0 0 0
+                                           0)))
   )
 
 (defun make-iorobot ()
@@ -687,3 +855,33 @@
 
 (setq *ri* (make-iorobot))
 (objects (list *ri*))
+
+(defun r ()
+  (send *ri* :reset-pose))
+
+(defun l ()
+  (load "robot.l")
+  (a))
+
+
+(defun i (arm)
+  (let ((tmp))
+    (case arm
+      (:larm
+       (setq tmp (make-cascoords :pos (send *ri* :larm :end-coords :worldpos)))
+       (send *ri* :larm :inverse-kinematics tmp :revert-if-fail nil)
+       )
+      (:rleg
+       (setq tmp (make-cascoords :pos (send *ri* :rleg :end-coords :worldpos)))
+       (send *ri* :rleg :inverse-kinematics tmp)
+       )
+      (:rarm
+       (setq tmp (make-cascoords :pos (send *ri* :rarm :end-coords :worldpos)))
+       (send tmp :locate #f(0 100 100))
+       (send *ri* :rarm :inverse-kinematics tmp :revert-if-fail nil)
+       )
+      (:lleg
+       (setq tmp (make-cascoords :pos (send *ri* :lleg :end-coords :worldpos)))
+       (send *ri* :lleg :inverse-kinematics tmp)
+       )
+      )))
