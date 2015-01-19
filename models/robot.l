@@ -87,7 +87,7 @@
                           :rarm-link1)))
         (send bl :put :joint-coords
               (make-cascoords :coords
-                              (send (send (send (send (send (send (car bs) :get :joint-coords) :copy-worldcoords ) :locate #f(0 0 -125)) :rotate -pi/2 :z) :rotate 0 :x) :rotate pi :z)))
+                              (send (send (send (send (send (send (car bs) :get :joint-coords) :copy-worldcoords ) :locate #f(0 0 -70)) :rotate -pi/2 :z) :rotate 0 :x) :rotate pi :z)))
         (send bl :assoc (send bl :get :joint-coords))
         bl))))
 
@@ -818,7 +818,7 @@
                                           0.0 0.0 0.0
                                           0.0 0.0 0.0
                                           0.0)))
-  (:reset-pose
+  (:reset-pose2
    ()
    ;; (send self :angle-vector (float-vector 0 0 -45 75 30 0
    ;;                                        0 0 -45 75 30 0
@@ -827,8 +827,15 @@
    ;;                                        0.0)))
    (send self :angle-vector (float-vector 0 0 -15 30 15 0
                                           0 0 -15 30 15 0
-                                          0.0 60.0 -30.0
-                                          0.0 60.0 -30.0
+                                          0.0 -60.0 -30.0
+                                          0.0 60.0 30.0
+                                          0.0)))
+  (:reset-pose
+   ()
+   (send self :angle-vector (float-vector 0 0 -45 75 30 0
+                                          0 0 -45 75 30 0
+                                          0.0 -60.0 -30.0
+                                          0.0 60.0 30.0
                                           0.0)))
   (:bend-leg ()
 	 (send self :angle-vector (float-vector 0 0 -60 90 30 0
@@ -848,40 +855,19 @@
                                            0 0 0
                                            0 0 0
                                            0)))
+  (:kneel ()
+          (send self :angle-vector (float-vector 0.0 0.0 -45.0 135.0 90.0 0.0
+                                                 0.0 0.0 -45.0 135.0 90.0 0.0
+                                                 0.0 -60.0 -30.0
+                                                 0.0 60.0 30.0
+                                                 0.0)))
+  (:hold-out ()
+             (send self :angle-vector (float-vector 0.0 0.0 80.0 120.0 90.0 0.0
+                                                    0.0 0.0 80.0 120.0 90.0 0.0
+                                                    -90.0 -90.0 0.0
+                                                    +90.0 90.0 0.0
+                                                    0.0)))
   )
 
 (defun make-iorobot ()
   (setq *iorobot* (instance iorobot :init)))
-
-(setq *ri* (make-iorobot))
-(objects (list *ri*))
-
-(defun r ()
-  (send *ri* :reset-pose))
-
-(defun l ()
-  (load "robot.l")
-  (a))
-
-
-(defun i (arm)
-  (let ((tmp))
-    (case arm
-      (:larm
-       (setq tmp (make-cascoords :pos (send *ri* :larm :end-coords :worldpos)))
-       (send *ri* :larm :inverse-kinematics tmp :revert-if-fail nil)
-       )
-      (:rleg
-       (setq tmp (make-cascoords :pos (send *ri* :rleg :end-coords :worldpos)))
-       (send *ri* :rleg :inverse-kinematics tmp)
-       )
-      (:rarm
-       (setq tmp (make-cascoords :pos (send *ri* :rarm :end-coords :worldpos)))
-       (send tmp :locate #f(0 100 100))
-       (send *ri* :rarm :inverse-kinematics tmp :revert-if-fail nil)
-       )
-      (:lleg
-       (setq tmp (make-cascoords :pos (send *ri* :lleg :end-coords :worldpos)))
-       (send *ri* :lleg :inverse-kinematics tmp)
-       )
-      )))
