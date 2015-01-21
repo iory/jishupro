@@ -76,7 +76,7 @@ rleg_j6_controller:
         min: 0
         max: 1023
 
-lleg_j7_controller:
+lleg_j1_controller:
     controller:
         package: dynamixel_controllers
         module: joint_position_controller
@@ -89,7 +89,7 @@ lleg_j7_controller:
         min: 0
         max: 1023
 
-lleg_j8_controller:
+lleg_j2_controller:
     controller:
         package: dynamixel_controllers
         module: joint_position_controller
@@ -103,7 +103,7 @@ lleg_j8_controller:
         max: 1023
 
 
-lleg_j9_controller:
+lleg_j3_controller:
     controller:
         package: dynamixel_controllers
         module: joint_position_controller
@@ -117,7 +117,7 @@ lleg_j9_controller:
         max: 1023
 
 
-lleg_j10_controller:
+lleg_j4_controller:
     controller:
         package: dynamixel_controllers
         module: joint_position_controller
@@ -130,7 +130,7 @@ lleg_j10_controller:
         min: 0
         max: 1023
 
-lleg_j11_controller:
+lleg_j5_controller:
     controller:
         package: dynamixel_controllers
         module: joint_position_controller
@@ -143,7 +143,7 @@ lleg_j11_controller:
         min: 0
         max: 1023
 
-lleg_j12_controller:
+lleg_j6_controller:
     controller:
         package: dynamixel_controllers
         module: joint_position_controller
@@ -242,7 +242,7 @@ head_j1_controller:
     joint_name: head_joint1
     joint_speed: 2.0
     motor:
-        id: 18
+        id: 19
         init: 512
         min: 0
         max: 1023

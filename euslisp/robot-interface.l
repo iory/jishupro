@@ -1,6 +1,10 @@
 (load "package://pr2eus/robot-interface.l")
+(load "package://pr2eus/speak.l")
 (load "package://jishupro/models/robot.l")
 (ros::load-ros-manifest "control_msgs")
+
+(ros::roseus "iorobot_interface")
+(ros::advertise "robotsound" sound_play::SoundRequest 5)
 
 (defclass iorobot-interface
   :super robot-interface
@@ -48,12 +52,11 @@
     (unix::sleep 3)
     ))
 
-
 (defun ww ()
   (let ((c (walk-motion *io*)))
     (send *ri* :angle-vector-sequence
           (mapcar #'(lambda (x) (cadr (memq :angle-vector x))) c)
-          (make-list (length c) :initial-element 200)
+          (make-list (length c) :initial-element 100)
           )
   ))
 
@@ -159,5 +162,75 @@
   (unix::sleep 3)
   (send *io* :reset-pose)
   (send *ri* :angle-vector (send *io* :angle-vector) 3000)
+  (unix::sleep 3)
+  )
+
+
+(defun shake-head ()
+  (let ((i 0))
+    (do-until-key ()
+      ;;(setf (elt (send *io* :angle-vector) 18) i)
+      (setq tmp (send *io* :angle-vector))
+      (setf (elt tmp 18) i)
+      (format t "~A~%" (elt tmp 18))
+      (format t "~A~%" (send *io* :angle-vector ))
+      (send *ri* :angle-vector (send *io* :angle-vector tmp))
+      (unix::sleep 1)
+      (setq i (+ i 10))
+      (setq i (mod i 180))
+      )))
+
+
+(defun b ()
+  (send *ri* :angle-vector (send *io* :bend-arm)))
+
+
+(defun push-up ()
+  (speak-en "push up!")
+  (do-until-key ()
+    (send *ri* :angle-vector (send *io* :bend-arm) 1000)
+    (unix::sleep 1)
+    (send *ri* :angle-vector (send *io* :bend-arm2) 1000)
+    (unix::sleep 1)
+    ))
+
+
+;; (defun return ()
+;;   (send *ri* :angle-vector (send *io* :bend-leg-arm2))
+;;   (unix::sleep 1)
+;;   (send *ri* :angle-vector (send *io* :bend-leg-arm) 100)
+;; )
+
+
+;; (defun walk-motion
+;;   (robot)
+;;   "walking motion using preview-control, gait-generator, and fullbody ik"
+;;   (let* ((is-small-robot
+;;           (< (abs (elt (send (send (car (send robot :links)) :transformation (apply #'midcoords 0.5 (send robot :legs :end-coords))) :worldpos) 2)) 400))
+;;          (default-step-height (if is-small-robot 2
+;;           :default-step-height default-step-height)
+;;     )
+;;   ;;
+;;   (warn ";; test2 ;; calc footstep-list from go pos param~%")
+;;   (objects (list robot
+;;                  (apply #'midcoords 0.5 (send robot :legs :end-coords))
+;;                  (send (send (apply #'midcoords 0.5 (send robot :legs :end-coords)) :translate (float-vector 500 150 0)) :rotate (deg2rad 45) :z)))
+;;   (if is-small-robot (send robot :gen-footstep-parameter :ratio 0.3))
+;;   (send robot :calc-walk-pattern-from-footstep-list
+;;         (send robot :go-pos-params->footstep-list
+;;               500 0 0) ;; x[mm] y[mm] th[deg]
+;;         :debug-view :no-message
+;;         :default-step-height default-step-height)
+;;   )))
+
+
+(defun my-walk ()
+  (send *ri* :angle-vector (send *io* :angle-vector #f(-2.734934e-05 20.7265 -55.8641 100.728 47.8641 20.7267 -1.913858e-05 17.37 -34.8734 69.7468 34.8734 22.3701 0.0 -60.0 -30.0 0.0 60.0 30.0 0.0)))
+  (unix::sleep 1)
+  (send *ri* :angle-vector (send *io* :angle-vector #f(-2.734934e-05 20.7265 -70.8641 100.728 47.8641 20.7267 -1.913858e-05 17.37
+                                                                     -34.8734 69.7468 34.8734 22.3701 0.0 -60.0 -30.0 0.0 60.0 30.0 0.0)))
+  (unix::sleep 3)
+  (send *ri* :angle-vector (send *io* :angle-vector #f(-2.734934e-05 20.7265 -55.8641 95.728 45.8641 20.7267 -1.913858e-05 17.37
+                                                                     -34.8734 69.7468 38.8734 10.3701 0.0 -60.0 -30.0 0.0 60.0 30.0 0.0)))
   (unix::sleep 3)
   )

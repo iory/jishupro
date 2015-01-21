@@ -87,19 +87,20 @@
                           :rarm-link1)))
         (send bl :put :joint-coords
               (make-cascoords :coords
-                              (send (send (send (send (send (send (car bs) :get :joint-coords) :copy-worldcoords ) :locate #f(0 0 -70)) :rotate -pi/2 :z) :rotate 0 :x) :rotate pi :z)))
+                              (send (send (send (send (send (send (car bs) :get :joint-coords) :copy-worldcoords ) :locate #f(0 0 -70)) :rotate pi/2 :z) :rotate pi :y) :rotate 0 :x)))
         (send bl :assoc (send bl :get :joint-coords))
         bl))))
 
 (defun make-robot-rarm-link2 ()
   (let ((b1 (make-dynamixel-AX-12A-frame2-body)))
+    (send b1 :rotate pi :x)
     (let ((bl (instance bodyset-link
                         :init (make-cascoords)
                         :bodies (list b1)
                         :name :rarm-link2)))
       (send bl :put :joint-coords
             (make-cascoords :coords
-                            (send (send (send b1 :copy-worldcoords) :locate #f(0 0 0)) :rotate -pi :z)))
+                            (send (send (send b1 :copy-worldcoords) :locate #f(0 0 0)) :rotate 0 :z)))
       (send bl :assoc (send bl :get :joint-coords))
       bl)))
 
@@ -150,19 +151,22 @@
                           :larm-link1)))
         (send bl :put :joint-coords
               (make-cascoords :coords
-                              (send (send (send (send (send (car bs) :get :joint-coords) :copy-worldcoords ) :locate #f(0 0 25)) :rotate pi/2 :z) :rotate pi :x)))
+                              ;;(send (send (send (send (send (car bs) :get :joint-coords) :copy-worldcoords ) :locate #f(0 0 25)) :rotate pi/2 :z) :rotate pi :x)))
+                              (send (send (send (send (send (send (car bs) :get :joint-coords) :copy-worldcoords ) :locate #f(0 0 25)) :rotate -pi/2 :z) :rotate pi :y) :rotate pi :x)))
         (send bl :assoc (send bl :get :joint-coords))
         bl))))
 
 (defun make-robot-larm-link2 ()
   (let ((b1 (make-dynamixel-AX-12A-frame2-body)))
+    (send b1 :rotate pi :x)
     (let ((bl (instance bodyset-link
                         :init (make-cascoords)
                         :bodies (list b1)
                         :name :larm-link2)))
       (send bl :put :joint-coords
             (make-cascoords :coords
-                            (send (send b1 :copy-worldcoords) :locate #f(0 0 0))))
+                            ;;(send (send b1 :copy-worldcoords) :locate #f(0 0 0))))
+                            (send (send (send b1 :copy-worldcoords) :locate #f(0 0 0)) :rotate 0 :z)))
       (send bl :assoc (send bl :get :joint-coords))
       bl)))
 
@@ -342,8 +346,8 @@
      (setq rleg (send self :make-leg-links :rleg))
      (setq lleg (send self :make-leg-links :lleg))
 
-     (send left-leg-root-link :translate (float-vector 15 40 20) :world)
-     (send right-leg-root-link :translate (float-vector 15 -40 20) :world)
+     (send left-leg-root-link :translate (float-vector 5 40 20) :world)
+     (send right-leg-root-link :translate (float-vector 5 -40 20) :world)
      (send left-leg-root-link :rotate -pi/2 :y)
      (send right-leg-root-link :rotate -pi/2 :y)
      (send left-leg-root-link :rotate pi :z)
@@ -395,8 +399,8 @@
                          :child-link (elt head 1)
                          :name "head_joint1"
                          :axis :z
-                         :min -90
-                         :max 90))
+                         :min -180
+                         :max 180))
 
      ;; right-leg
      (setq jcr0 (instance rotational-joint
@@ -596,8 +600,8 @@
                          :child-link (elt rarm 3)
                          :name "rarm_joint3"
                          :axis :x
-                         :min -90
-                         :max 90))
+                         :min -80
+                         :max 80))
 
      (setq joint-larm0 (instance rotational-joint
                          :init :parent-link (elt larm 0)
@@ -620,8 +624,8 @@
                          :child-link (elt larm 3)
                          :name "larm_joint3"
                          :axis :x
-                         :min -90
-                         :max 90))
+                         :min -80
+                         :max 80))
 
      ;; 4. define slots for robot class
      ;; links and joint-list for cascaded-link.
@@ -828,14 +832,14 @@
    (send self :angle-vector (float-vector 0 0 -15 30 15 0
                                           0 0 -15 30 15 0
                                           0.0 -60.0 -30.0
-                                          0.0 60.0 30.0
+                                          0.0 -60.0 30.0
                                           0.0)))
   (:reset-pose
    ()
-   (send self :angle-vector (float-vector 0 0 -45 75 30 0
-                                          0 0 -45 75 30 0
-                                          0.0 -60.0 -30.0
-                                          0.0 60.0 30.0
+   (send self :angle-vector (float-vector 0 0 -50 75 30 0
+                                          0 0 -50 75 30 0
+                                          0.0 -90.0 0.0
+                                          0.0 90.0 0.0
                                           0.0)))
   (:bend-leg ()
 	 (send self :angle-vector (float-vector 0 0 -60 90 30 0
@@ -867,6 +871,46 @@
                                                     -90.0 -90.0 0.0
                                                     +90.0 90.0 0.0
                                                     0.0)))
+  (:bend-arm ()
+             (send self :angle-vector (float-vector 0.0 0.0 0.0 0.0 0.0 0.0
+                                                    0.0 0.0 0.0 0.0 0.0 0.0
+                                                    90.0 -90.0 0.0
+                                                    -90.0 90.0 0.0
+                                                    0.0)))
+  (:back-arm ()
+             (send self :angle-vector (float-vector 0.0 0.0 0.0 0.0 0.0 0.0
+                                                    0.0 0.0 0.0 0.0 0.0 0.0
+                                                    -90.0 -90.0 0.0
+                                                    90.0 90.0 0.0
+                                                    0.0)))
+  (:bend-leg-arm ()
+             (send self :angle-vector (float-vector 0.0 0.0 0.0 90.0 0.0 0.0
+                                                    0.0 0.0 0.0 90.0 0.0 0.0
+                                                    -90.0 -90.0 0.0
+                                                    90.0 90.0 0.0
+                                                    0.0)))
+  (:bend-leg-arm2 ()
+             (send self :angle-vector (float-vector 0.0 0.0 0.0 90.0 0.0 0.0
+                                                    0.0 0.0 0.0 90.0 0.0 0.0
+                                                    -90.0 -45.0 -90.0
+                                                    90.0 45.0 90.0
+                                                    0.0)))
+  (:bend-arm2 ()
+              (send self :angle-vector (float-vector 0.0 0.0 0.0 0.0 0.0 0.0
+                                                     0.0 0.0 0.0 0.0 0.0 0.0
+                                                     90.0 -45.0 -90.0
+                                                     -90.0 45.0 90.0
+                                                     0.0)))
+  (:single-support ()
+                   (send self :angle-vector
+
+                         (float-vector -2.734934e-05 20.7265 -47.8641 100.728 47.8641 20.7267 -1.913858e-05 17.37 -34.8734 69.7468 34.8734 22.3701 0.0 -60.0 -30.0 0.0 60.0 30.0 0.0)))
+  (:cheer ()
+          (send self :angle-vector (float-vector 0.0 0.0 0.0 0.0 0.0 0.0
+                                                 0.0 0.0 0.0 0.0 0.0 0.0
+                                                 0.0 -90.0 0.0
+                                                 0.0 -90.0 0.0
+                                                 0.0)))
   )
 
 (defun make-iorobot ()

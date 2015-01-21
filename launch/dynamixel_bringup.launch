@@ -28,12 +28,12 @@
                 rleg_j4_controller
                 rleg_j5_controller
                 rleg_j6_controller
-                lleg_j7_controller
-		        lleg_j8_controller
-                lleg_j9_controller
-                lleg_j10_controller
-                lleg_j11_controller
-		        lleg_j12_controller
+                lleg_j1_controller
+		        lleg_j2_controller
+                lleg_j3_controller
+                lleg_j4_controller
+                lleg_j5_controller
+		        lleg_j6_controller
                 rarm_j1_controller
                 rarm_j2_controller
                 rarm_j3_controller
@@ -55,12 +55,12 @@
                 rleg_j4_controller
                 rleg_j5_controller
                 rleg_j6_controller
-                lleg_j7_controller
-		        lleg_j8_controller
-                lleg_j9_controller
-                lleg_j10_controller
-                lleg_j11_controller
-		        lleg_j12_controller
+                lleg_j1_controller
+		        lleg_j2_controller
+                lleg_j3_controller
+                lleg_j4_controller
+                lleg_j5_controller
+		        lleg_j6_controller
                 rarm_j1_controller
                 rarm_j2_controller
                 rarm_j3_controller
