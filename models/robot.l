@@ -28,7 +28,7 @@
       bl)))
 
 (defun make-robot-torso-link ()
-  (let ((b1 (make-cube 40 70 100)))
+  (let ((b1 (make-cube 40 20 100)))
     (send b1 :put :face-color :slategray)
     (send b1 :rotate pi/2 :x)
     (let ((bl (instance bodyset-link
@@ -361,7 +361,7 @@
 
      ;; body torso parts
      (setq torso (send self :make-torso-link))
-     (send torso :translate (float-vector 0 0 70) :world)
+     (send torso :translate (float-vector 0 0 100) :world)
 
      ;; arm setting
      ;; right-arm
@@ -375,6 +375,11 @@
      (setq left-arm-root-link (car larm))
      (send left-arm-root-link :move-coords (send aroot-link :get :joint-coords) (send left-arm-root-link :copy-worldcoords))
      (send left-arm-root-link :translate (float-vector 0 35 150) :world)
+
+     (send torso :assoc right-arm-root-link)
+     (send torso :assoc left-arm-root-link)
+     (send torso :assoc head-root-link)
+     (send torso :translate (float-vector 0 0 -40) :world)
 
      ;; 2. assoc links
      ;;    Root link should be associated with "self".

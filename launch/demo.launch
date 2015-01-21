@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="jishupro" type="speak_server.py" name="speak_server"></node>
+  <node pkg="jishupro" type="read-servo-state.l" name="read_servo_state"></node>
+  <node pkg="jishupro" type="robot-publisher.l" name="robot_publisher"></node>
+</launch>

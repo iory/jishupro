@@ -1,10 +1,14 @@
 (load "package://pr2eus/robot-interface.l")
-(load "package://pr2eus/speak.l")
+(load "/home/iori/catkin_ws/jsk_roseus/src/jsk_roseus/roseus_tutorials/src/kinect-model-viewer.l")
+;;(load "package://pr2eus/speak.l")
+(load "speak.l")
 (load "package://jishupro/models/robot.l")
 (ros::load-ros-manifest "control_msgs")
 
 (ros::roseus "iorobot_interface")
-(ros::advertise "robotsound" sound_play::SoundRequest 5)
+(ros::advertise "speaker" std_msgs::String 5)
+;; (ros::advertise "robotsound" sound_play::SoundRequest 5)
+;; (ros::advertise "robotsound_jp" sound_play::SoundRequest 5)
 
 (defclass iorobot-interface
   :super robot-interface
@@ -165,7 +169,11 @@
   (unix::sleep 3)
   )
 
-
+(defun hello ()
+  (speak "hello everyone")
+  (unix:sleep 3)
+  (speak "I am iorobot")
+  )
 (defun shake-head ()
   (let ((i 0))
     (do-until-key ()
@@ -186,7 +194,7 @@
 
 
 (defun push-up ()
-  (speak-en "push up!")
+  (speak "push up. push up")
   (do-until-key ()
     (send *ri* :angle-vector (send *io* :bend-arm) 1000)
     (unix::sleep 1)
@@ -234,3 +242,60 @@
                                                                      -34.8734 69.7468 38.8734 10.3701 0.0 -60.0 -30.0 0.0 60.0 30.0 0.0)))
   (unix::sleep 3)
   )
+
+
+(defun shadow (&key robot fname loop-hook)
+  (let ((floor (make-cube 2000 1000 10 :pos #f(1000 0 0))) f)
+    (if fname (setq f (open fname :direction :output)))
+    (ros::roseus "kinect_bvh")
+    (if (not (boundp '*tl*))
+        (setq *tl* (instance ros::transform-listener :init)))
+    (setq b (make-kinect-bvh-robot-model)) ;; Kinect Human Model
+    (objects (list floor b))
+    (if robot (objects robot))
+    ;;(defun find-node (name) (find name *arrows* :key #'(lambda (x) (send x :name)) :test #'string=))
+    (if f (send b :dump-hierarchy f))
+    ;;;
+    ;;; Main Loop
+    ;;;
+
+
+    ;; (pr2)
+    ;; (if (not (boundp '*irtviewer*)) (make-irtviewer))
+    ;; (objects (list *pr2* floor b))
+    ;; (send *irtviewer* :draw-objects)
+
+    (do-until-key
+     (let ()
+       (when (send b :copy-state-from-tf *tl*) ;; copy kinect human tracker information to human body
+         ;;
+         ;; track human body
+         ;;
+	 (format t "kinect robot : larm pos=~A, rarm pos=~A (world)~%" ;; display arm tool coordinates in world coordinates
+		 (send b :larm :end-coords :worldpos)
+		 (send b :rarm :end-coords :worldpos))
+	 (format t "             : larm pos=~A, rarm pos=~A (local)~%" ;; display arm tool cooridnates with reference to human torso coordinates
+		 (send (send (send b :torso :end-coords) :transformation (send b :larm :end-coords)) :worldpos)
+		 (send (send (send b :torso :end-coords) :transformation (send b :rarm :end-coords)) :worldpos)))
+       ;;(format t "~A~%" (send b :rarm :angle-vector))
+
+       (setq tmp (send *io* :angle-vector))
+       (setq bangle (send b :angle-vector))
+       (setf (elt tmp 12) (elt bangle 20))
+	   (setf (elt tmp 13) (- (elt bangle 18) 90.0))
+	   (setf (elt tmp 14) (elt bangle 21))
+	   (setf (elt tmp 15) (elt bangle 26))
+	   (setf (elt tmp 16) (+ (elt bangle 24) 90.0))
+	   (setf (elt tmp 17) (elt bangle 27))
+       (setf (elt tmp 18) (elt bangle 31))
+       (send *io* :angle-vector tmp)
+       (a)
+
+       (when robot
+	 (send b :copy-state-to robot))
+       (if (functionp loop-hook) (funcall loop-hook))
+       (send (get *viewer* :pickviewer) :look-all)
+       (x::window-main-one)
+       (if f (send b :dump-motion f))
+       )) ;; do-until-key
+    ))
