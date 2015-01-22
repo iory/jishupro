@@ -38,7 +38,8 @@
 (objects (list *io*))
 
 (defun a ()
-  (send *ri* :angle-vector (send *io* :angle-vector) 3000))
+  (send *ri* :angle-vector (send *io* :angle-vector) 3000)
+  (unix:sleep 3))
 
 (defun w ()
   (walk-motion *io*))
@@ -60,7 +61,44 @@
   (let ((c (walk-motion *io*)))
     (send *ri* :angle-vector-sequence
           (mapcar #'(lambda (x) (cadr (memq :angle-vector x))) c)
-          (make-list (length c) :initial-element 100)
+          (make-list (length c) :initial-element 300)
+          )
+    ))
+
+(defun ww2 ()
+  (let* ((c (walk-motion *io*))
+        (angles (mapcar #'(lambda (x) (cadr (memq :angle-vector x))) c))
+        (offset 10))
+    (dotimes (i (length angles))
+      (let ((angle (elt angles i)))
+        ;; (if (< 0 (elt angle 0))
+        ;;     (setf (elt angle 0) (- (elt angle 0) offset))
+        ;;     (setf (elt angle 0) (+ (elt angle 0) offset))
+        ;;     )
+        ;; (if (< 0 (elt angle 6))
+        ;;     (setf (elt angle 6) (- (elt angle 6) offset))
+        ;;     (setf (elt angle 6) (+ (elt angle 6) offset))
+        ;;     )
+        (if (< 0 (elt angle 3))
+            (setf (elt angle 3) (- (elt angle 3) offset))
+            (setf (elt angle 3) (+ (elt angle 3) offset))
+            )
+        (if (< 0 (elt angle 4))
+            (setf (elt angle 4) (- (elt angle 4) offset))
+            (setf (elt angle 4) (+ (elt angle 4) offset))
+            )
+        (if (< 0 (elt angle 9))
+            (setf (elt angle 9) (- (elt angle 9) offset))
+            (setf (elt angle 9) (+ (elt angle 9) offset))
+            )
+        (if (< 0 (elt angle 10))
+            (setf (elt angle 10) (- (elt angle 10) offset))
+            (setf (elt angle 10) (+ (elt angle 10) offset))
+            )
+        ))
+    (send *ri* :angle-vector-sequence
+          angles
+          (make-list (length c) :initial-element 300)
           )
   ))
 
@@ -75,8 +113,7 @@
     (send *ri* :angle-vector-sequence
           (mapcar #'(lambda (x) (cadr (memq :angle-vector x))) c)
           times
-          )
-  ))
+          )))
 
 (defun d (c)
   (angle-vector-sequence (mapcar #'(lambda (x) (cadr (memq :angle-vector x))) c)))
@@ -195,6 +232,13 @@
 
 (defun push-up ()
   (speak "push up. push up")
+  (send *ri* :angle-vector (send *io* :kneel))
+  (unix:sleep 3)
+  (send *ri* :angle-vector (send *io* :kneel2))
+  (unix:sleep 3)
+  ;;(send *ri* :angle-vector (send *io* :))
+  (b)
+  (unix:sleep 3)
   (do-until-key ()
     (send *ri* :angle-vector (send *io* :bend-arm) 1000)
     (unix::sleep 1)
@@ -209,27 +253,44 @@
 ;;   (send *ri* :angle-vector (send *io* :bend-leg-arm) 100)
 ;; )
 
+(defun walk-motion
+  (robot)
+  "walking motion using preview-control, gait-generator, and fullbody ik"
+  (let* ((is-small-robot
+          (< (abs (elt (send (send (car (send robot :links)) :transformation (apply #'midcoords 0.5 (send robot :legs :end-coords))) :worldpos) 2)) 400))
+         (default-step-height (if is-small-robot 10 50)))
+  (send robot :reset-pose)
+  (send robot :fix-leg-to-coords (make-coords))
+  (objects (list robot))
+  (warn ";; test1 ;; specify footstep-list~%")
+  (let* ((test1-scale (if is-small-robot 0.25 1.0))
+        (footstep-list
+         (list (make-coords :coords (send robot :rleg :end-coords :copy-worldcoords) :name :rleg)
+               (make-coords :coords (send (send robot :lleg :end-coords :copy-worldcoords) :translate (scale test1-scale #f(100 0 0))) :name :lleg)
+               (make-coords :coords (send (send robot :rleg :end-coords :copy-worldcoords) :translate (scale test1-scale #f(200 0 0))) :name :rleg)
+               (make-coords :coords (send (send robot :lleg :end-coords :copy-worldcoords) :translate (scale test1-scale #f(300 0 0))) :name :lleg)
+               (make-coords :coords (send (send robot :rleg :end-coords :copy-worldcoords) :translate (scale test1-scale #f(400 0 0))) :name :rleg)
+               (make-coords :coords (send (send robot :lleg :end-coords :copy-worldcoords) :translate (scale test1-scale #f(400 0 0))) :name :lleg))))
+    (objects (append (list robot) footstep-list))
+    ;; footstep-list is coordinates list.
+    ;; This should have :l/r method or :l/r name.
+    (send robot :calc-walk-pattern-from-footstep-list
+          footstep-list :debug-view :no-message
+          :default-step-height default-step-height)
+    )
+  ;;
+  ;; (warn ";; test2 ;; calc footstep-list from go pos param~%")
+  ;; (objects (list robot
+  ;;                (apply #'midcoords 0.5 (send robot :legs :end-coords))
+  ;;                (send (send (apply #'midcoords 0.5 (send robot :legs :end-coords)) :translate (float-vector 500 150 0)) :rotate (deg2rad 45) :z)))
+  ;; (if is-small-robot (send robot :gen-footstep-parameter :ratio 0.3))
+  ;; (send robot :calc-walk-pattern-from-footstep-list
+  ;;       (send robot :go-pos-params->footstep-list
+  ;;             200 0 0) ;; x[mm] y[mm] th[deg]
+  ;;       :debug-view :no-message
+  ;;       :default-step-height default-step-height)
+  ))
 
-;; (defun walk-motion
-;;   (robot)
-;;   "walking motion using preview-control, gait-generator, and fullbody ik"
-;;   (let* ((is-small-robot
-;;           (< (abs (elt (send (send (car (send robot :links)) :transformation (apply #'midcoords 0.5 (send robot :legs :end-coords))) :worldpos) 2)) 400))
-;;          (default-step-height (if is-small-robot 2
-;;           :default-step-height default-step-height)
-;;     )
-;;   ;;
-;;   (warn ";; test2 ;; calc footstep-list from go pos param~%")
-;;   (objects (list robot
-;;                  (apply #'midcoords 0.5 (send robot :legs :end-coords))
-;;                  (send (send (apply #'midcoords 0.5 (send robot :legs :end-coords)) :translate (float-vector 500 150 0)) :rotate (deg2rad 45) :z)))
-;;   (if is-small-robot (send robot :gen-footstep-parameter :ratio 0.3))
-;;   (send robot :calc-walk-pattern-from-footstep-list
-;;         (send robot :go-pos-params->footstep-list
-;;               500 0 0) ;; x[mm] y[mm] th[deg]
-;;         :debug-view :no-message
-;;         :default-step-height default-step-height)
-;;   )))
 
 
 (defun my-walk ()

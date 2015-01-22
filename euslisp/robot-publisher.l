@@ -16,6 +16,8 @@
 (if (ros::has-param "~robot")
     (setq *robot-forms* (read-from-string (ros::get-param "~robot"))))
 
+(defparameter *angle* 0)
+(defun init ()
 (let ((x (ros::get-param "~x" 0)) (y (ros::get-param "~y" 0)))
   (dolist (robot-form *robot-forms*)
     (ros::ros-info ">> ~A~%" robot-form)
@@ -23,7 +25,8 @@
            (robot-name (send robot :name))
            (robot-frame-id (format nil "/~A" (string-downcase robot-name)))
            msg)
-      (format t "==============~A~%" robot)
+      (send robot :reset-pose)
+      ;;(format t "==============~A~%" robot)
       (ros::advertise robot-frame-id visualization_msgs::Marker 5)
       (ros::ROS-INFO "loading and advertise ~a" robot-name)
       (setq tm (instance mtimer :init))
@@ -41,8 +44,9 @@
       (send robot :locate (float-vector x y 0) :world)
       (if (> (incf y 800) 4000) (setq x (- x 1000) y 0))
       (send *tfb* :send-transform robot "/tmp" robot-frame-id)
-      )))
+      ))))
 
+(init)
 (ros::rate 5)
 (do-until-key
  (dolist (msg *robot-msgs*)
@@ -58,6 +62,7 @@
      (ros::ROS-INFO "publish coords ~A" frame-id)
      (setq coords (send *tfl* :lookup-transform "/tmp" frame-id (ros::time 0)))
      (send coords :rotate 0.1 :z)
-     (send *tfb* :send-transform coords "/tmp" frame-id)))
+     (send *tfb* :send-transform coords "/tmp" frame-id))
+   (init))
  (ros::spin-once)
  (ros::sleep))

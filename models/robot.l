@@ -122,6 +122,29 @@
         (send bl :assoc (send bl :get :joint-coords))
         bl))))
 
+;; (defun make-robot-rarm-link3 ()
+;;   (let ((b1s (make-dynamixel-AX-12A-motor-unit-bodies :use-frame1 (list :bottom)))
+;;         (b2s (make-dynamixel-AX-12A-motor-body)))
+;;     (send b2s :rotate pi/2 :z)
+;;     ;;(send b2s :rotate pi/2 :y)
+;;     (send b2s :rotate pi/2 :x)
+;;     (send b2s :locate #f(-60 20 0))
+;;     (let ((bs (append (mapcar #'cadr b1s) (list b2s))))
+;;       ;; (car bs) is servo model
+;;       (dolist (b (cdr bs)) (send (car bs) :assoc b))
+
+;;       (send (car bs) :rotate pi/2 :x)
+;;       (send (car bs) :locate #f(0 0 0))
+
+;;       (let ((bl (instance bodyset-link
+;;                           :init (make-cascoords)
+;;                           :bodies bs :name :rarm-link3)))
+;;         (send bl :put :joint-coords
+;;               (make-cascoords :coords (send (send (send (send (send (car bs) :copy-worldcoords) :locate #f(0 -70 0)) :rotate -pi/2 :y) :rotate pi :z) :rotate pi :x)))
+;;         (send bl :assoc (send bl :get :joint-coords))
+;;         bl))))
+
+
 (defun make-robot-rarm-link4 ()
   (let ((b1 (make-dynamixel-AX-12A-motor-body)))
     (send b1 :rotate pi/2 :x)
@@ -172,14 +195,14 @@
 
 (defun make-robot-larm-link3 ()
   (let ((b1s (make-dynamixel-AX-12A-motor-unit-bodies :use-frame1 (list :bottom)))
-        (b2 (make-dynamixel-AX-12A-frame2-body)))
-    (let ((bs (append (mapcar #'cadr b1s) (list b2))))
+        (b2s (make-dynamixel-AX-12A-frame2-body)))
+    (let ((bs (append (mapcar #'cadr b1s) (list b2s))))
       ;; (car bs) is servo model
       (dolist (b (cdr bs)) (send (car bs) :assoc b))
       (send (car bs) :rotate pi/2 :x)
-      (send b2 :rotate pi :z)
-      (send b2 :rotate pi/2 :x)
-      (send b2 :locate #f(0 0 -70))
+      (send b2s :rotate pi :z)
+      (send b2s :rotate pi/2 :x)
+      (send b2s :locate #f(0 0 -70))
       (let ((bl (instance bodyset-link
                           :init (make-cascoords)
                           :bodies bs :name :larm-link3)))
@@ -846,6 +869,9 @@
                                           0.0 -90.0 0.0
                                           0.0 90.0 0.0
                                           0.0)))
+   ;; (send self :angle-vector #f(0.0 0.0 -65.0 90.0 30.0 0.0 0.0 0.0 -65.0 90.0 30.0 0.0 30.0 -90.0 -30.0 -30.0
+   ;;                                  90.0 30.0 0.0)))
+
   (:bend-leg ()
 	 (send self :angle-vector (float-vector 0 0 -60 90 30 0
                                             0 0 -60 90 30 0
@@ -870,6 +896,9 @@
                                                  0.0 -60.0 -30.0
                                                  0.0 60.0 30.0
                                                  0.0)))
+  (:kneel2 ()
+           (send self :angle-vector #f(0.0 0.0 -90.0 135.0 90.0 0.0 0.0 0.0 -90.0 135.0 90.0 0.0 90.0 -60.0 -30.0 -90.0 60.0 30.0 0.0)
+                 ))
   (:hold-out ()
              (send self :angle-vector (float-vector 0.0 0.0 80.0 120.0 90.0 0.0
                                                     0.0 0.0 80.0 120.0 90.0 0.0
@@ -906,6 +935,7 @@
                                                      90.0 -45.0 -90.0
                                                      -90.0 45.0 90.0
                                                      0.0)))
+
   (:single-support ()
                    (send self :angle-vector
 
