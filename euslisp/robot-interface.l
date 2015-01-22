@@ -208,9 +208,26 @@
 
 (defun hello ()
   (speak "hello everyone")
+  (send *io* :angle-vector #f(0.0 0.0 -50.0 75.0 30.0 0.0 0.0 0.0 -50.0 75.0 30.0 0.0 180.0 -90.0 0.0 0.0 90.0 0.0 0.0))
+  (a)
   (unix:sleep 3)
+  (send *io* :reset-pose)
+  (a)
   (speak "I am iorobot")
   )
+
+(defun bye ()
+  (do-until-key ()
+    (speak "bye bye.")
+    (send *io* :angle-vector #f(0.0 0.0 -50.0 75.0 30.0 0.0 0.0 0.0 -50.0 75.0 30.0 0.0 180.0 -90.0 0.0 0.0 90.0 0.0 0.0))
+    (send *ri* :angle-vector (send *io* :angle-vector) 1000)
+    (unix:sleep 1)
+    (send *io* :angle-vector #f(0.0 0.0 -50.0 75.0 30.0 0.0 0.0 0.0 -50.0 75.0 30.0 0.0 180.0 0.0 0.0 0.0 90.0 0.0 0.0))
+    (send *ri* :angle-vector (send *io* :angle-vector) 1000)
+    (unix:sleep 1)
+  ))
+
+
 (defun shake-head ()
   (let ((i 0))
     (do-until-key ()
@@ -240,11 +257,21 @@
   (b)
   (unix:sleep 3)
   (do-until-key ()
+    (speak "one.")
     (send *ri* :angle-vector (send *io* :bend-arm) 1000)
     (unix::sleep 1)
     (send *ri* :angle-vector (send *io* :bend-arm2) 1000)
+    (speak "two.")
     (unix::sleep 1)
     ))
+
+
+(defun push-up-once ()
+  (send *ri* :angle-vector (send *io* :bend-arm) 1000)
+  (unix::sleep 1)
+  (send *ri* :angle-vector (send *io* :bend-arm2) 1000)
+  (unix::sleep 1)
+  ))
 
 
 ;; (defun return ()
@@ -290,6 +317,18 @@
   ;;       :debug-view :no-message
   ;;       :default-step-height default-step-height)
   ))
+
+(defun stand-up2 ()
+  ;; (send *io* :angle-vector #f(0.0 0.0 -100.0 0.0 50.0 0.0 0.0 0.0 -90.0 0.0 50.0 0.0 90.0 -90.0 0.0 -90.0 90.0 0.0 0.0)
+  ;;       #f(0.0 0.0 -90.0 -30.0 0.0 0.0 0.0 0.0 -90.0 -30.0 0.0 0.0 90.0 -90.0 0.0 -90.0 90.0 0.0 0.0)
+#f(0.0 0.0 -90.0 90.0 90.0 0.0 0.0 0.0 -90.0 90.0 90.0 0.0 90.0 -90.0 0.0 -90.0 90.0 0.0 0.0)
+(send *io* :angle-vector #f(0.0 0.0 -90.0 90.0 90.0 0.0 0.0 0.0 -90.0 90.0 90.0 0.0 90.0 -45.0 -90.0 -90.0 45.0 90.0 0.0))
+(send *io* :angle-vector #f(0.0 0.0 -50.0 135.0 90.0 0.0 0.0 0.0 -50.0 135.0 90.0 0.0 90.0 -90.0 0.0 -90.0 90.0 0.0))
+
+
+))
+
+
 
 
 
