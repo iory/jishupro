@@ -2,6 +2,7 @@
 (load "/home/iori/catkin_ws/jsk_roseus/src/jsk_roseus/roseus_tutorials/src/kinect-model-viewer.l")
 ;;(load "package://pr2eus/speak.l")
 (load "speak.l")
+(load "package://jishupro/euslisp/walk-motions.l")
 (load "package://jishupro/models/robot.l")
 (ros::load-ros-manifest "control_msgs")
 
@@ -9,6 +10,7 @@
 (ros::advertise "speaker" std_msgs::String 5)
 ;; (ros::advertise "robotsound" sound_play::SoundRequest 5)
 ;; (ros::advertise "robotsound_jp" sound_play::SoundRequest 5)
+
 
 (defclass iorobot-interface
   :super robot-interface
@@ -53,7 +55,11 @@
     (send *ri* :angle-vector (send *io* :kneel) 3000)
     (unix::sleep 3)
     ;;(send *ri* :angle-vector (send *io* :init-pose) 3000)
-    (send *ri* :angle-vector (send *io* :reset-pose) 3000)
+    (send *ri* :angle-vector (send *io* :angle-vector (float-vector 0 0 -50 85 40 0
+                                                                    0  0 -50 85 40 0
+                                                                    0.0 -90.0 0.0
+                                                                    -0.0 90.0 0.0
+                                                                    0.0)) 3000)
     (unix::sleep 3)
     ))
 
@@ -122,6 +128,10 @@
   (send *io* :fix-leg-to-coords (make-coords))
   (send *io* :update-descendants)
   (send *irtviewer* :draw-objects))
+
+(defun r ()
+  (send *io* :reset-pose)
+  (a))
 
 
 ;; (defun ik-demo0
@@ -208,12 +218,14 @@
 
 (defun hello ()
   (speak "hello everyone")
+  ;;(speak-en "hello everyone")
   (send *io* :angle-vector #f(0.0 0.0 -50.0 75.0 30.0 0.0 0.0 0.0 -50.0 75.0 30.0 0.0 180.0 -90.0 0.0 0.0 90.0 0.0 0.0))
   (a)
-  (unix:sleep 3)
+  (unix:sleep 1)
   (send *io* :reset-pose)
   (a)
   (speak "I am iorobot")
+  ;;(speak-en "I am iorobot")
   )
 
 (defun bye ()
@@ -263,7 +275,10 @@
     (send *ri* :angle-vector (send *io* :bend-arm2) 1000)
     (speak "two.")
     (unix::sleep 1)
-    ))
+    )
+  (unix:sleep 3)
+  (speak "I am so tired.")
+  )
 
 
 (defun push-up-once ()
@@ -285,12 +300,12 @@
   "walking motion using preview-control, gait-generator, and fullbody ik"
   (let* ((is-small-robot
           (< (abs (elt (send (send (car (send robot :links)) :transformation (apply #'midcoords 0.5 (send robot :legs :end-coords))) :worldpos) 2)) 400))
-         (default-step-height (if is-small-robot 10 50)))
+         (default-step-height (if is-small-robot 25 50)))
   (send robot :reset-pose)
   (send robot :fix-leg-to-coords (make-coords))
   (objects (list robot))
   (warn ";; test1 ;; specify footstep-list~%")
-  (let* ((test1-scale (if is-small-robot 0.25 1.0))
+  (let* ((test1-scale (if is-small-robot 0.6 1.0))
         (footstep-list
          (list (make-coords :coords (send robot :rleg :end-coords :copy-worldcoords) :name :rleg)
                (make-coords :coords (send (send robot :lleg :end-coords :copy-worldcoords) :translate (scale test1-scale #f(100 0 0))) :name :lleg)
@@ -324,9 +339,7 @@
 #f(0.0 0.0 -90.0 90.0 90.0 0.0 0.0 0.0 -90.0 90.0 90.0 0.0 90.0 -90.0 0.0 -90.0 90.0 0.0 0.0)
 (send *io* :angle-vector #f(0.0 0.0 -90.0 90.0 90.0 0.0 0.0 0.0 -90.0 90.0 90.0 0.0 90.0 -45.0 -90.0 -90.0 45.0 90.0 0.0))
 (send *io* :angle-vector #f(0.0 0.0 -50.0 135.0 90.0 0.0 0.0 0.0 -50.0 135.0 90.0 0.0 90.0 -90.0 0.0 -90.0 90.0 0.0))
-
-
-))
+)
 
 
 
@@ -345,6 +358,9 @@
 
 
 (defun shadow (&key robot fname loop-hook)
+  (speak "shadow mode start.")
+  (unix:sleep 3)
+  (speak "I trace your moving.")
   (let ((floor (make-cube 2000 1000 10 :pos #f(1000 0 0))) f)
     (if fname (setq f (open fname :direction :output)))
     (ros::roseus "kinect_bvh")
@@ -383,13 +399,24 @@
        (setq bangle (send b :angle-vector))
        (setf (elt tmp 12) (elt bangle 20))
 	   (setf (elt tmp 13) (- (elt bangle 18) 90.0))
-	   (setf (elt tmp 14) (elt bangle 21))
+	   ;;(setf (elt tmp 14) (elt bangle 21))
+       (setf (elt tmp 14) (- (elt bangle 23)))
 	   (setf (elt tmp 15) (elt bangle 26))
 	   (setf (elt tmp 16) (+ (elt bangle 24) 90.0))
-	   (setf (elt tmp 17) (elt bangle 27))
+	   ;; (setf (elt tmp 17) (elt bangle 27))
+       (setf (elt tmp 17) (- (elt bangle 29)))
        (setf (elt tmp 18) (elt bangle 31))
+
+       ;;(setf (elt tmp 0) (elt bangle 11))
+       ;;(setf (elt tmp 1) (elt bangle 12))
+       (setf (elt tmp 8) (- (elt bangle 13)))
+       ;;(setf (elt tmp 3) (elt bangle 16))
+       ;; (setf (elt tmp 7) (elt bangle 6))
+       (setf (elt tmp 2) (- (elt bangle 7)))
+       ;; (setf (elt tmp 9) (elt bangle 10))
        (send *io* :angle-vector tmp)
        (a)
+
 
        (when robot
 	 (send b :copy-state-to robot))
@@ -398,4 +425,22 @@
        (x::window-main-one)
        (if f (send b :dump-motion f))
        )) ;; do-until-key
+    (speak "shadow mode end.")
     ))
+
+
+(defun walk (   )
+  ;;(send *ri* :angle-vector-sequence walk-list (make-list (length walk-list):initial-element 200))
+  (let ((i 0))
+    (dolist (x walk-list2)
+      (format t ";; ~A ~A ~%" i x)
+      (read-line)
+      (send *io* :angle-vector x)
+      (send *ri* :angle-vector (send *io* :angle-vector) 1000)
+      (setq i (1+ i))
+      )
+    ))
+
+
+(send *io* :reset-pose)
+(a)
