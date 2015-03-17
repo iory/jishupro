@@ -1,5 +1,5 @@
 (load "package://pr2eus/robot-interface.l")
-(load "/home/iori/catkin_ws/jsk_roseus/src/jsk_roseus/roseus_tutorials/src/kinect-model-viewer.l")
+(load "package://roseus_tutorials/src/kinect-model-viewer.l")
 ;;(load "package://pr2eus/speak.l")
 (load "speak.l")
 (load "package://jishupro/euslisp/walk-motions.l")
